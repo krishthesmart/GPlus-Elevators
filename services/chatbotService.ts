@@ -19,13 +19,18 @@ export class ChatbotService {
     };
   }
 
-  static processUserMessage(message: string): ChatMessage {
+    static processUserMessage(message: string): ChatMessage {
     const lowerMessage = message.toLowerCase().trim();
     let response = '';
     let quickReplies: string[] | undefined;
 
+    // Size and space requirements - MUST come before general product inquiries
+    if (this.containsKeywords(lowerMessage, ['size', 'space', 'minimum', 'dimension', 'area', 'footprint', 'how much space', 'room required'])) {
+      response = this.getSizeRequirements();
+      quickReplies = ['View Products', 'Installation Requirements', 'Calculate Price', 'Back to Menu'];
+    }
     // Product inquiries
-    if (this.containsKeywords(lowerMessage, ['product', 'model', 'elevator', 'lift', 'view'])) {
+    else if (this.containsKeywords(lowerMessage, ['product', 'model', 'elevator', 'lift', 'view'])) {
       response = this.getProductOverview();
       quickReplies = QUICK_REPLIES.products;
     }
@@ -49,8 +54,8 @@ export class ChatbotService {
       response = this.getPricingInfo();
       quickReplies = ['View Products', 'Calculate Price', 'Back to Menu'];
     }
-    // Installation
-    else if (this.containsKeywords(lowerMessage, ['install', 'installation', 'setup', 'civil work', 'space', 'requirement'])) {
+    // Installation (excluding space/size which is handled above)
+    else if (this.containsKeywords(lowerMessage, ['install', 'installation', 'setup', 'civil work', 'pit', 'core cutting', 'requirement', 'prepare'])) {
       response = this.getInstallationInfo();
       quickReplies = ['View Products', 'Request Quote', 'Back to Menu'];
     }
@@ -282,14 +287,50 @@ Would you like a personalized quote?`;
 Use our calculator for exact pricing!`;
   }
 
+  private static getSizeRequirements(): string {
+    return `📏 **Space Requirements for GPlus Elevators**
+
+**Minimum Size Required:**
+• **3 feet x 3 feet (900mm x 900mm)** - Our most compact option
+• If installed on floor level: Additional 6 inches to 1 foot may be required
+
+**Available Sizes:**
+1. **3x3 feet** - Minimum/Compact (Most Popular)
+2. **3.6x3.6 feet** - Standard/Spacious  
+3. **4x4 feet** - Maximum/Luxury
+4. **Custom sizes** - Available on request
+
+**Space-Saving Design:**
+✓ Machine-room-less (MRL) - No need for separate machine room
+✓ 30% less floor area than conventional elevators
+✓ Slim shaft profile maximizes usable space
+✓ Reduced pit depth requirements
+
+**Installation Flexibility:**
+• Can fit in minimal space
+• Suitable for tight staircase areas
+• Works with shallow foundations
+• Perfect for existing homes (core cutting available)
+
+**For Your Reference:**
+The 3x3 feet model is our **premium compact choice** - part of our G+2 CFM (Customer's Favorite Model).
+
+Need help choosing the right size for your space?`;
+  }
+
   private static getInstallationInfo(): string {
     return `🔧 **Installation Requirements**
 
 **Space Requirements:**
-• Minimum: 3x3 feet (standard)
-• Options: 3.6x3.6 or 4x4 feet
-• No extensive civil work needed
+• Minimum: 3x3 feet (900mm x 900mm)
+• Available: 3.6x3.6 or 4x4 feet
+• Custom sizes available on request
+• If floor-level install: Add 6 inches to 1 foot
+
+**No Extensive Civil Work Needed:**
+• Machine-room-less design
 • Core cutting for existing homes
+• No bulky machine rooms required
 
 **Pre-Installation (Customer's Responsibility):**
 1. Core cutting of roof
